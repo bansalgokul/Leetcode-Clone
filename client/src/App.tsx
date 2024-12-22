@@ -1,15 +1,13 @@
 import "./App.css";
 import Landing from "./components/Landing";
 
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import Signin from "./components/Signin";
-// import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useSetRecoilState } from "recoil";
+import { userAtom } from "./store/atoms/user";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDhj4hQVdF-Y4AvbiZcFFO1K3eFzphhtcI",
   authDomain: "leetcode-clone-3c678.firebaseapp.com",
@@ -21,16 +19,50 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
+export const provider = new GoogleAuthProvider();
+export const auth = getAuth();
+
 // const analytics = getAnalytics(app);
 
 function App() {
+  const setUser = useSetRecoilState(userAtom);
+  const [user, loading] = useAuthState(auth);
+
+  if (user && user.email) {
+    setUser({
+      isLoggedIn: true,
+      user: {
+        email: user.email,
+      },
+    });
+  } else {
+    setUser({
+      isLoggedIn: false,
+      user: undefined,
+    });
+  }
+
+  console.log(user);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (user) {
+    return (
+      <>
+        <div>
+          <Landing />
+        </div>
+      </>
+    );
+  }
+
   return (
-    <>
-      <div>
-        <Signin />
-      </div>
-    </>
+    <div>
+      <Signin />
+    </div>
   );
 }
 

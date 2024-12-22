@@ -1,8 +1,12 @@
+import { useRecoilState } from "recoil";
+import { userAtom } from "../store/atoms/user";
 
 const Landing = () => {
-  return (
-    <div className="text-3xl">Landing</div>
-  )
-}
+  const [user] = useRecoilState(userAtom);
 
-export default Landing
+  return (
+    <div className="text-3xl">You are logged in as {user.user?.email}</div>
+  );
+};
+
+export default Landing;
